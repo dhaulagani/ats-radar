@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATS-Radar — Free 100% Private ATS Resume & Job Match Analyzer</title>
+  <meta name="description" content="Scan your resume against any job description locally in your browser. Zero server uploads, instant missing keyword detection, impact scoring, and AI prompt tailoring.">
+  <meta name="keywords" content="free ats resume checker, resume keyword scanner, private ats scanner, tech resume optimizer, software engineer resume ats score">
+  <meta name="author" content="dhaulagani">
+  <link rel="canonical" href="https://dhaulagani.github.io/ats-radar/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dhaulagani.github.io/ats-radar/">
+  <meta property="og:title" content="ATS-Radar — Free Private ATS Resume & Job Match Scanner">
+  <meta property="og:description" content="Check your ATS match score in 1 second. Runs 100% locally in your browser with PDF parsing, keyword gap audit, and optional free AI rewrite.">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ATS-Radar — 100% Client-Side ATS Resume Scanner">
+  <meta name="twitter:description" content="Zero signups. Zero paywalls. Instant ATS keyword matching and quantified bullet diagnostics.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ATS-Radar",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "100% client-side ATS resume keyword scanner, impact quantifier, and AI tailoring assistant.",
+    "url": "https://dhaulagani.github.io/ats-radar/"
+  }
+  </script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a href="./" class="logo">
+        <span class="logo-mark">AR</span>
+        <span>ATS-Radar</span>
+      </a>
+      <span class="privacy-pill">100% Browser-Local • Zero Uploads</span>
+      <div class="topbar-actions">
+        <a href="https://github.com/dhaulagani/ats-radar" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">GitHub</a>
+        <a href="https://dhaulagani.github.io/awesome-free-developer-infra/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Free Dev Infra</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Beat Applicant Tracking Systems Without Paying $29/mo</h1>
+      <p>
+        Paste your resume (or drop a PDF) and target job description. Get an instant ATS keyword gap audit, impact quantification score, and a tailored rewrite prompt — 100% locally in your browser.
+      </p>
+      <div class="quick-actions">
+        <button id="loadSampleBtn" class="btn btn-secondary btn-sm" type="button">Load Sample Resume &amp; JD</button>
+        <button id="clearAllBtn" class="btn btn-secondary btn-sm" type="button">Clear All</button>
+      </div>
+    </section>
+
+    <section class="workspace-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">1. Your Resume</div>
+          <div class="panel-tools">
+            <label for="resumeFile" class="btn btn-secondary btn-sm">Upload PDF / TXT</label>
+            <input id="resumeFile" class="file-input" type="file" accept=".pdf,.txt,.md">
+          </div>
+        </div>
+        <textarea id="resumeInput" class="editor" placeholder="Paste your resume text here, or upload a .pdf / .txt / .md file above..."></textarea>
+        <div class="meta-line">
+          <span>Parsed locally in memory</span>
+          <span id="resumeStats">0 words</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">2. Target Job Description</div>
+        </div>
+        <textarea id="jdInput" class="editor" placeholder="Paste the full job posting requirements and responsibilities here..."></textarea>
+        <div class="meta-line">
+          <span>Extracts required stack &amp; domain terms</span>
+          <span id="jdStats">0 words</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="analyze-bar">
+      <button id="analyzeBtn" class="btn btn-primary btn-analyze" type="button">Scan ATS Match Score</button>
+    </div>
+
+    <section id="resultsSection" class="results-section">
+      <div class="score-overview">
+        <div class="gauge-wrap">
+          <svg class="gauge-svg" viewBox="0 0 140 140">
+            <circle class="gauge-bg" cx="70" cy="70" r="58"></circle>
+            <circle id="scoreGaugeFill" class="gauge-fill" cx="70" cy="70" r="58"></circle>
+          </svg>
+          <div class="gauge-label">
+            <span id="scoreNumber" class="gauge-number">0%</span>
+            <span id="scoreVerdict" class="gauge-sub">Match Score</span>
+          </div>
+        </div>
+
+        <div id="subscoresGrid" class="subscores-grid"></div>
+      </div>
+
+      <div class="details-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Missing Critical Keywords (Click to Copy)</div>
+          </div>
+          <div id="missingKeywords" class="chips-wrap"></div>
+
+          <div class="panel-header" style="margin-top: 12px;">
+            <div class="panel-title">Matched Keywords</div>
+          </div>
+          <div id="matchedKeywords" class="chips-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">ATS Actionable Diagnostics</div>
+          </div>
+          <ul id="diagnosticsList" class="diag-list"></ul>
+        </div>
+      </div>
+
+      <div class="ai-panel">
+        <div class="panel-header">
+          <div class="panel-title">3. AI Tailored Rewrite Engine (Zero-Server BYOK or Free Prompt Copy)</div>
+          <button id="copyPromptBtn" class="btn btn-primary btn-sm" type="button">Copy Tailored Prompt / Output</button>
+        </div>
+
+        <div class="byok-row">
+          <select id="aiProvider" aria-label="AI Provider">
+            <option value="groq">Groq Free API (Llama 3.3 70B)</option>
+            <option value="openrouter">OpenRouter Free Tier</option>
+          </select>
+          <input id="aiApiKey" type="password" placeholder="Optional: paste Groq (gsk_...) or OpenRouter key (stored in browser only)">
+          <button id="runAiBtn" class="btn btn-secondary btn-sm" type="button">Run Live AI Rewrite</button>
+        </div>
+
+        <pre id="aiOutput" class="ai-output">Run an ATS Scan to generate your tailored rewrite prompt...</pre>
+      </div>
+    </section>
+
+    <section class="promo-grid">
+      <div class="promo-card">
+        <div>
+          <h3>Pro Engineering Resume &amp; Outreach Kit</h3>
+          <p>
+            Skip formatting headaches. Grab battle-tested single-column LaTeX/Markdown ATS templates, 50 quantified Google-XYZ bullet formulas, and cold recruiter outreach scripts.
+          </p>
+        </div>
+        <div class="promo-links">
+          <a id="proPackBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-pro btn-sm">Get Pro LaTeX + 50 Bullet Formulas ($9)</a>
+        </div>
+      </div>
+
+      <div class="promo-card">
+        <div>
+          <h3>Deploy Your Developer Portfolio for $0</h3>
+          <p>
+            Stand out to hiring managers with live projects instead of static PDFs. Browse 27 daily-verified free cloud hosts, serverless Postgres DBs, and AI APIs.
+          </p>
+        </div>
+        <div class="promo-links">
+          <a id="infraDirBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Free Dev Infra Directory</a>
+          <a id="doPromoBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">DigitalOcean $200 Credit</a>
+          <a id="railwayPromoBtn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Railway $5/mo Credit</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Built with zero tracking &amp; zero backend storage by <a href="https://github.com/dhaulagani" target="_blank" rel="noopener noreferrer">@dhaulagani</a>.
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
